@@ -1,0 +1,232 @@
+/* * DOSYA ADI: musteri/assets/css/portal_lively.css
+ * AÇIKLAMA: Müşteri portalının ana tasarım dosyası (Lively Tema)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+    /* Renk Paleti - Canlı ve Ferah */
+    --primary: #764ba2;     /* Tatlı Mor */
+    --secondary: #667eea;   /* Pastel Mavi */
+    --success: #00b894;     /* Zümrüt Yeşili */
+    --warning: #fdcb6e;     /* Sıcak Sarı/Altın */
+    --danger: #ff7675;      /* Tatlı Kırmızı */
+    
+    --bg-main: #f4f7fc;     /* Çok hafif grimsi mavi arkaplan */
+    --card-bg: #ffffff;     /* Kart arkaplanı */
+    
+    --text-main: #2d3436;   /* Koyu Gri (Siyah yerine) */
+    --text-muted: #636e72;  /* Açık Gri */
+    
+    --border-color: #edf2f7;
+    --card-shadow: 0 10px 30px rgba(118, 75, 162, 0.05);
+    --card-hover-shadow: 0 15px 35px rgba(118, 75, 162, 0.12);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* =========================================
+   1. KART (WIDGET) TASARIMLARI
+========================================= */
+.stat-card {
+    background: var(--card-bg);
+    border: none;
+    border-radius: 24px;
+    padding: 25px;
+    height: 100%;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.section-card {
+    background: var(--card-bg);
+    border-radius: 28px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* =========================================
+   2. RANDEVU / TAKVİM KARTLARI
+========================================= */
+.appointment-item {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    border-left: 8px solid var(--primary);
+    transition: background-color 0.2s;
+}
+
+.appointment-item:hover {
+    background: #fcfaff;
+}
+
+.date-box {
+    text-align: center;
+    min-width: 80px;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    border-radius: 16px;
+    color: #fff;
+    padding: 12px;
+    margin-right: 20px;
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.25);
+}
+
+.date-box strong { 
+    font-size: 1.6rem; 
+    display: block; 
+    line-height: 1; 
+    font-weight: 800; 
+}
+
+.date-box span { 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    font-weight: 700; 
+    opacity: 0.9; 
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   3. HESAP ÖZETİ TABLOSU
+========================================= */
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    width: 100%;
+}
+
+.custom-table thead th {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 15px;
+    font-weight: 700;
+}
+
+.custom-table tbody tr {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    transition: transform 0.2s;
+}
+
+.custom-table tbody tr:hover {
+    transform: scale(1.01);
+}
+
+.custom-table tbody td {
+    padding: 18px 15px;
+    border: none;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.custom-table tbody tr td:first-child { border-radius: 16px 0 0 16px; }
+.custom-table tbody tr td:last-child { border-radius: 0 16px 16px 0; }
+
+/* İşlem İkonları */
+.icon-box {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+.icon-box.bg-satis { background: rgba(118, 75, 162, 0.1); color: var(--primary); }
+.icon-box.bg-tahsilat { background: rgba(0, 184, 148, 0.1); color: var(--success); }
+
+/* =========================================
+   4. MODAL (SÖZLEŞME EKRANI)
+========================================= */
+.modal-content { 
+    border-radius: 28px; 
+    border: none; 
+    overflow: hidden; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.modal-header { 
+    background: linear-gradient(135deg, var(--secondary), var(--primary)); 
+    color: #fff; 
+    padding: 25px 30px; 
+    border: none;
+}
+
+.modal-body {
+    padding: 30px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    line-height: 1.8;
+}
+
+/* =========================================
+   5. BUTONLAR VE ROZETLER (BADGE)
+========================================= */
+.btn-primary-lively {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    border: none;
+    color: #fff;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-primary-lively:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.badge-lively {
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid var(--border-color);
+    background: #fff;
+}
+
+/* =========================================
+   6. YARDIMCI SINIFLAR
+========================================= */
+.text-primary-lively { color: var(--primary) !important; }
+.text-success-lively { color: var(--success) !important; }
+.text-warning-lively { color: var(--warning) !important; }
+
+.firma-adi{
+    font-weight:600;
+    white-space:normal;
+    line-height:1.2;
+    max-width:220px;
+}
+
+.nav-portal{
+    background:#ffffff !important;
+    border-bottom:1px solid #eee;
+    box-shadow:0 2px 10px rgba(0,0,0,0.04);
+}

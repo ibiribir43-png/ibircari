@@ -1,0 +1,115 @@
+/* ibiR Wedding Müşteri Portalı Premium Stil Dosyası */
+:root {
+    --p-dark: #0f0f0f;
+    --s-dark: #1a1a1a;
+    --gold: #d4af37;
+    --emerald: #00a86b;
+    --soft-white: #f5f5f5;
+    --text-muted: #a0a0a0;
+    --border-color: #2a2a2a;
+}
+
+body {
+    background-color: var(--p-dark);
+    color: var(--soft-white);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Kartlar */
+.stat-card {
+    background: var(--s-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 25px;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px);
+}
+
+.section-card {
+    background: var(--s-dark);
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+/* Tablolar */
+.custom-table {
+    color: var(--soft-white);
+}
+
+.custom-table thead {
+    background: rgba(255,255,255,0.02);
+}
+
+.custom-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px;
+}
+
+.custom-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+/* Randevu Kartları */
+.appointment-item {
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--gold);
+    display: flex;
+    align-items: center;
+}
+
+.date-box {
+    text-align: center;
+    min-width: 70px;
+    border-right: 1px solid var(--border-color);
+    margin-right: 20px;
+    padding-right: 20px;
+}
+
+.date-box h3 {
+    color: var(--gold);
+    margin: 0;
+    font-weight: 800;
+}
+
+/* Badges */
+.badge-status {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.badge-income { background: rgba(0, 168, 107, 0.1); color: var(--emerald); }
+.badge-expense { background: rgba(255, 255, 255, 0.05); color: #fff; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--p-dark); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+.firma-adi{
+    font-weight:600;
+    white-space:normal;
+    line-height:1.2;
+    max-width:220px;
+}

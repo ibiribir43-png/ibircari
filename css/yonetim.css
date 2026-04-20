@@ -1,0 +1,710 @@
+/* yonetim.css - Tüm yönetim paneli sayfalarında kullanılacak */
+
+/* YÖNETİM PANELİ TEMEL STİLLERİ */
+:root {
+    --yonetim-primary: #667eea;
+    --yonetim-secondary: #764ba2;
+    --yonetim-sidebar: #2c3e50;
+    --yonetim-bg: #f8f9fa;
+    --yonetim-card-bg: #fff;
+    --yonetim-border: #e9ecef;
+    --yonetim-text: #333;
+    --yonetim-text-light: #6c757d;
+}
+
+body.yonetim-body {
+    background-color: var(--yonetim-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--yonetim-text);
+    min-height: 100vh;
+}
+
+/* YÖNETİM NAVBAR */
+.navbar-yonetim {
+    background: var(--yonetim-card-bg);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--yonetim-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-yonetim .navbar-brand {
+    color: var(--yonetim-primary) !important;
+    font-weight: 700;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-yonetim .navbar-brand i {
+    margin-right: 10px;
+    font-size: 1.6rem;
+}
+
+.navbar-yonetim .nav-link {
+    color: var(--yonetim-text) !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin: 0 5px;
+    padding: 8px 12px !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-yonetim .nav-link i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.navbar-yonetim .nav-link:hover,
+.navbar-yonetim .nav-link.active {
+    background-color: rgba(102, 126, 234, 0.1);
+    color: var(--yonetim-primary) !important;
+}
+
+.navbar-yonetim .nav-link.active {
+    font-weight: 600;
+}
+
+/* DROPDOWN MENÜ */
+.navbar-yonetim .dropdown-menu {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    padding: 8px 0;
+    min-width: 200px;
+}
+
+.navbar-yonetim .dropdown-item {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    color: var(--yonetim-text);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-yonetim .dropdown-item i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.navbar-yonetim .dropdown-item:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+    color: var(--yonetim-primary);
+}
+
+/* KONTEYNER */
+.container-yonetim {
+    max-width: 1400px;
+    padding: 25px 15px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1200px) {
+    .container-yonetim {
+        padding: 25px 30px;
+    }
+}
+
+/* KARTLAR (CARDS) */
+.card-yonetim {
+    background: var(--yonetim-card-bg);
+    border: 1px solid var(--yonetim-border);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.card-yonetim:hover {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.card-yonetim .card-header {
+    background: linear-gradient(135deg, var(--yonetim-primary) 0%, var(--yonetim-secondary) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 15px 20px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-yonetim .card-body {
+    padding: 20px;
+}
+
+.card-yonetim .card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--yonetim-border);
+    border-radius: 0 0 12px 12px;
+    padding: 15px 20px;
+}
+
+/* TABLOLAR */
+.table-yonetim {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+}
+
+.table-yonetim thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid var(--yonetim-border);
+    color: var(--yonetim-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 12px 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-yonetim tbody td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--yonetim-border);
+    vertical-align: middle;
+}
+
+.table-yonetim tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+.table-yonetim tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* FORMLAR */
+.form-yonetim .form-label {
+    font-weight: 600;
+    color: var(--yonetim-text);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-yonetim .form-control,
+.form-yonetim .form-select {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+.form-yonetim .form-control:focus,
+.form-yonetim .form-select:focus {
+    border-color: var(--yonetim-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-yonetim .form-text {
+    font-size: 0.85rem;
+    color: var(--yonetim-text-light);
+}
+
+/* BUTONLAR */
+.btn-yonetim {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-yonetim i {
+    font-size: 1rem;
+}
+
+.btn-yonetim-primary {
+    background: linear-gradient(135deg, var(--yonetim-primary) 0%, var(--yonetim-secondary) 100%);
+    border: none;
+    color: white;
+}
+
+.btn-yonetim-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.btn-yonetim-outline-primary {
+    border: 2px solid var(--yonetim-primary);
+    color: var(--yonetim-primary);
+    background: transparent;
+}
+
+.btn-yonetim-outline-primary:hover {
+    background: var(--yonetim-primary);
+    color: white;
+}
+
+.btn-yonetim-secondary {
+    background: #6c757d;
+    border: none;
+    color: white;
+}
+
+.btn-yonetim-success {
+    background: #28a745;
+    border: none;
+    color: white;
+}
+
+.btn-yonetim-warning {
+    background: #ffc107;
+    border: none;
+    color: #333;
+}
+
+.btn-yonetim-danger {
+    background: #dc3545;
+    border: none;
+    color: white;
+}
+
+/* BADGE'LER */
+.badge-yonetim {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-yonetim-primary {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--yonetim-primary);
+}
+
+.badge-yonetim-success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.badge-yonetim-warning {
+    background: rgba(255, 193, 7, 0.1);
+    color: #d39e00;
+}
+
+.badge-yonetim-danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* ALERT'LER */
+.alert-yonetim {
+    border: none;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.alert-yonetim i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* PAGINATION */
+.pagination-yonetim .page-link {
+    border: 1px solid var(--yonetim-border);
+    color: var(--yonetim-text);
+    margin: 0 3px;
+    border-radius: 6px;
+    padding: 8px 15px;
+    transition: all 0.3s;
+}
+
+.pagination-yonetim .page-link:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+    color: var(--yonetim-primary);
+    border-color: var(--yonetim-primary);
+}
+
+.pagination-yonetim .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--yonetim-primary) 0%, var(--yonetim-secondary) 100%);
+    border-color: var(--yonetim-primary);
+    color: white;
+}
+
+/* MODALLAR */
+.modal-yonetim .modal-content {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.modal-yonetim .modal-header {
+    background: linear-gradient(135deg, var(--yonetim-primary) 0%, var(--yonetim-secondary) 100%);
+    color: white;
+    border: none;
+    border-radius: 15px 15px 0 0;
+    padding: 20px 25px;
+}
+
+.modal-yonetim .modal-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.modal-yonetim .modal-body {
+    padding: 25px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-yonetim .modal-footer {
+    border-top: 1px solid var(--yonetim-border);
+    padding: 15px 25px;
+    border-radius: 0 0 15px 15px;
+}
+
+/* SİDEBAR (Eğer kullanacaksan) */
+.sidebar-yonetim {
+    background: var(--yonetim-sidebar);
+    color: white;
+    min-height: calc(100vh - 70px);
+    width: 250px;
+    position: fixed;
+    left: 0;
+    top: 70px;
+    padding: 20px 0;
+    transition: all 0.3s;
+}
+
+.sidebar-yonetim.collapsed {
+    width: 70px;
+}
+
+.sidebar-yonetim .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 12px 20px;
+    margin: 5px 0;
+    border-radius: 0;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-yonetim .nav-link:hover,
+.sidebar-yonetim .nav-link.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-left-color: var(--yonetim-primary);
+}
+
+/* İÇERİK ALANI (Sidebar ile birlikte kullanılırsa) */
+.content-yonetim {
+    margin-left: 250px;
+    padding: 25px;
+    transition: all 0.3s;
+}
+
+.content-yonetim.expanded {
+    margin-left: 70px;
+}
+
+/* DASHBOARD ÖZEL STİLLER */
+.dashboard-welcome {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--yonetim-border);
+    margin-bottom: 25px;
+}
+
+.dashboard-welcome h4 {
+    color: var(--yonetim-text);
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.dashboard-welcome p {
+    color: var(--yonetim-text-light);
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+
+/* ÖZET KUTULARI */
+.ozet-kutu {
+    border: none;
+    border-radius: 12px;
+    color: white;
+    padding: 20px;
+    height: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.ozet-kutu:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--yonetim-primary) 0%, var(--yonetim-secondary) 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+    color: #333;
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+}
+
+/* HIZLI BUTONLAR */
+.hizli-btn {
+    border-radius: 12px;
+    padding: 20px 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid var(--yonetim-border);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    background: white;
+    color: var(--yonetim-text);
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.hizli-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    color: var(--yonetim-primary);
+    border-color: #ddd;
+    text-decoration: none;
+}
+
+/* AJANDA */
+.ajanda-card {
+    border: none;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    height: 100%;
+    overflow: hidden;
+}
+
+.ajanda-header {
+    background: linear-gradient(135deg, var(--yonetim-primary) 0%, var(--yonetim-secondary) 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px 12px 0 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .container-yonetim {
+        padding: 15px;
+    }
+    
+    .navbar-yonetim .navbar-nav {
+        padding: 15px 0;
+    }
+    
+    .navbar-yonetim .nav-link {
+        margin: 2px 0;
+    }
+    
+    .content-yonetim {
+        margin-left: 0 !important;
+        padding: 15px;
+    }
+    
+    .sidebar-yonetim {
+        width: 0;
+        overflow: hidden;
+    }
+    
+    .sidebar-yonetim.show {
+        width: 250px;
+    }
+    
+    .card-yonetim .card-body {
+        padding: 15px;
+    }
+    
+    .table-yonetim {
+        font-size: 0.9rem;
+    }
+    
+    .table-yonetim thead th,
+    .table-yonetim tbody td {
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .ozet-kutu,
+    .hizli-btn {
+        padding: 15px 10px;
+        margin-bottom: 15px;
+    }
+    
+    .btn-yonetim {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-yonetim .modal-body {
+        padding: 15px;
+    }
+}
+
+/* UTILITY CLASSES */
+.text-primary-yonetim { color: var(--yonetim-primary) !important; }
+.text-secondary-yonetim { color: var(--yonetim-secondary) !important; }
+.bg-light-yonetim { background-color: var(--yonetim-bg) !important; }
+.border-yonetim { border-color: var(--yonetim-border) !important; }
+
+/* ANİMASYONLAR */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* LOADING SPINNER */
+.spinner-yonetim {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(102, 126, 234, 0.2);
+    border-top-color: var(--yonetim-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* EMPTY STATE */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--yonetim-text-light);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+.empty-state h5 {
+    margin-bottom: 10px;
+    color: var(--yonetim-text);
+}
+
+/* STATS CARD */
+.stats-card {
+    border-left: 4px solid var(--yonetim-primary);
+    background: white;
+    padding: 20px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 20px;
+}
+
+.stats-card .stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--yonetim-primary);
+    margin-bottom: 5px;
+}
+
+.stats-card .stats-label {
+    font-size: 0.9rem;
+    color: var(--yonetim-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+/* YÖNETİM FORMLARI - EKSTRA STİLLER */
+.form-yonetim .bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6;
+}
+
+.form-yonetim .text-primary {
+    color: var(--yonetim-primary) !important;
+}
+
+.form-yonetim .form-text.small {
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+/* MÜŞTERİ EKLE ÖZEL STİLLERİ */
+.section-title {
+    color: var(--yonetim-text);
+    border-bottom: 2px solid var(--yonetim-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.form-group-required label::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* OTOMATİK NUMARA ALANI */
+.auto-number-field {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #adb5bd;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* MOBİL OPTİMİZASYON */
+@media (max-width: 768px) {
+    .d-grid-mobile { 
+        display: grid !important; 
+        gap: 10px;
+    }
+    
+    .btn-mobile {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .card-yonetim .card-body {
+        padding: 15px 10px;
+    }
+    
+    .form-yonetim .row {
+        margin-bottom: 15px;
+    }
+}
