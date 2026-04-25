@@ -1,5 +1,5 @@
 // DOSYA ADI: assets/js/gallery.js 
-// V4.20: Orijinal Tüm Mantık Korundu + Swipe (Kaydırma), Focus Mode ve Mobil Sepet Fixleri Eklendi!
+// V4.24: Akıllı Cache Yol Bulucu, %100 Zorunlu İndirme (Blob Fix), Sağ Tık Koruması
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -52,11 +52,118 @@ document.addEventListener('DOMContentLoaded', () => {
     let confirmCountFavorited = document.getElementById('confirm-count-favorited');
     let confirmGeneralNote = document.getElementById('confirm-general-note');
     
-    // YENİ: Mobil Focus Mode Butonları ve Sepet Toggle
+    // Mobil Focus Mode Butonları ve Sepet Toggle
     let focusSel = document.getElementById('f-sel');
     let focusFav = document.getElementById('f-fav');
     let cartToggleBtn = document.getElementById('cart-toggle-btn');
     let cartCloseBtn = document.querySelector('.cart-close');
+
+    // ==========================================
+    // YENİ: DİNAMİK "ZORUNLU ORİJİNAL İNDİR" BUTONLARI
+    // ==========================================
+    let btnMainDownload = null;
+    let focusDownload = null;
+
+    function initDownloadButtons() {
+        // Masaüstü İndir Butonu Ekle
+        let mainControlsBtns = document.querySelector('#main-controls .d-flex.gap-2');
+        if (mainControlsBtns && !document.getElementById('main-download-btn')) {
+            btnMainDownload = document.createElement('button');
+            btnMainDownload.className = 'action-btn';
+            btnMainDownload.id = 'main-download-btn';
+            btnMainDownload.innerHTML = '<i class="fas fa-download"></i> <span>İndir</span>';
+            mainControlsBtns.appendChild(btnMainDownload);
+            btnMainDownload.onclick = downloadOriginal;
+        }
+
+        // Mobil Şeffaf İndir Butonu Ekle
+        let mobileFocusControls = document.querySelector('.mobile-focus-controls');
+        if (mobileFocusControls && !document.getElementById('f-down')) {
+            focusDownload = document.createElement('button');
+            focusDownload.className = 'focus-btn';
+            focusDownload.id = 'f-down';
+            focusDownload.innerHTML = '<i class="fas fa-download"></i>';
+            mobileFocusControls.insertBefore(focusDownload, mobileFocusControls.firstChild);
+            focusDownload.onclick = downloadOriginal;
+        }
+    }
+
+    async function downloadOriginal() {
+    if (currentImageIndex === -1) return;
+
+    const image = masterImageList[currentImageIndex];
+
+    // SADECE DOSYA ADI (EN KRİTİK FIX)
+    const fileName =
+        image.filename ||
+        image.path.split('/').pop().split('?')[0];
+
+    const btnText = btnMainDownload ? btnMainDownload.querySelector('span') : null;
+
+    if (btnText) btnText.textContent = "İniyor...";
+    if (btnMainDownload) btnMainDownload.classList.add('opacity-50');
+    if (focusDownload) focusDownload.classList.add('opacity-50');
+
+    try {
+        // SADECE FILENAME GÖNDERİLİYOR
+        const url =
+            'secim.php?force_download=' +
+            encodeURIComponent(fileName) +
+            '&t=' + Date.now();
+
+        const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) throw new Error("Dosya indirilemedi");
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = fileName;
+
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+            a.remove();
+            window.URL.revokeObjectURL(blobUrl);
+        }, 1500);
+
+    } catch (error) {
+        console.error("İndirme hatası:", error);
+
+        // fallback (direkt link indir)
+        const a = document.createElement('a');
+        a.href = image.path;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+    } finally {
+        if (btnText) btnText.textContent = "İndir";
+        if (btnMainDownload) btnMainDownload.classList.remove('opacity-50');
+        if (focusDownload) focusDownload.classList.remove('opacity-50');
+    }
+}
+
+    // ==========================================
+    // AKILLI CACHE (ÖNİZLEME) MOTORU
+    // ==========================================
+    function getCachePath(originalPath) {
+        if (!originalPath) return "";
+        // Gelen orijinal yolun tam dosya adından öncesine "cache/" klasörünü enjekte eder.
+        let parts = originalPath.split('/');
+        let filename = parts.pop();
+        parts.push('cache');
+        parts.push(filename);
+        return parts.join('/');
+    }
 
     // ==========================================
     // 1. BAŞLATMA VE API ÇAĞRISI
@@ -65,6 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!filmstripLoading || !viewerPlaceholder) return;
         filmstripLoading.style.display = 'flex';
         viewerPlaceholder.style.display = 'flex';
+
+        // İndirme butonlarını sisteme dahil et
+        initDownloadButtons();
+
+        // Sağ Tık (Resmi Yeni Sekmede Aç) Engelleme
+        if (mainImage) {
+            mainImage.addEventListener('contextmenu', e => e.preventDefault());
+        }
 
         try {
             const response = await fetchWithCredentials('api_portal.php?action=get_images');
@@ -102,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 2. SANAL KAYDIRMA (VIRTUAL SCROLL - ORİJİNAL)
+    // 2. SANAL KAYDIRMA (VIRTUAL SCROLL)
     // ==========================================
     let virtualScrollRAF;
     function onFilmstripScroll() {
@@ -198,16 +313,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const img = document.createElement('img');
         img.className = 'thumb-image';
-        img.dataset.src = image.path;
-        img.setAttribute('data-thumb-path', image.path);
-        img.style.height = '100%';
-        img.style.width = '100%';
-        img.style.objectFit = 'cover';
+        
+        const cachePath = getCachePath(image.path);
+        
+        img.dataset.src = cachePath; 
+        img.setAttribute('data-thumb-path', image.path); 
+        img.setAttribute('data-original-src', image.path); 
+        
+        // CACHE HATASI KORUMASI VE LOGLAMA
+        img.onerror = function() {
+            console.warn("⚠️ THUMBNAIL CACHE YOK! Orijinale Dönülüyor: " + this.getAttribute('data-original-src'));
+            this.onerror = null;
+            this.src = this.getAttribute('data-original-src');
+        };
 
         const center = currentImageIndex > -1 ? currentImageIndex : 0;
         if (Math.abs(idx - center) <= PRELOAD_COUNT + OVERSCAN_COUNT) {
-            img.src = image.path;
+            img.src = cachePath; 
         }
+        
         img.alt = getFilename(image.path);
         img.loading = 'lazy';
         
@@ -280,10 +404,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         currentImageIndex = masterImageList.findIndex(img => img.path === image.path);
         
-        // YENİ: Resim değişirken hafif bir geçiş efekti (Opacity)
         mainImage.style.opacity = '0.5';
+        
+        // CACHE HATA KORUMASI (Orijinal Yüklemeye Düşerse Uyar)
+        mainImage.onerror = function() {
+            console.error("🛑 ANA RESİM CACHE YOK! Orijinal Yükleniyor (Yavaş Olabilir): " + image.path);
+            this.onerror = null;
+            this.src = image.path;
+        };
+
         setTimeout(() => {
-            mainImage.src = image.path;
+            mainImage.src = getCachePath(image.path);
             mainImage.style.opacity = '1';
         }, 100);
 
@@ -306,8 +437,18 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= PRELOAD_COUNT; i++) {
             const n = globalIndex + i;
             const p = globalIndex - i;
-            if (n < masterImageList.length) { preloadCache[masterImageList[n].path] = new Image(); preloadCache[masterImageList[n].path].src = masterImageList[n].path; }
-            if (p >= 0) { preloadCache[masterImageList[p].path] = new Image(); preloadCache[masterImageList[p].path].src = masterImageList[p].path; }
+            if (n < masterImageList.length) { 
+                const imgObj = new Image();
+                imgObj.onerror = function() { this.src = masterImageList[n].path; };
+                imgObj.src = getCachePath(masterImageList[n].path);
+                preloadCache[masterImageList[n].path] = imgObj; 
+            }
+            if (p >= 0) { 
+                const imgObj = new Image();
+                imgObj.onerror = function() { this.src = masterImageList[p].path; };
+                imgObj.src = getCachePath(masterImageList[p].path);
+                preloadCache[masterImageList[p].path] = imgObj; 
+            }
         }
     }
 
@@ -319,7 +460,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isFav = image.selection_type === 2 || image.selection_type === 3;
         const canNote = isSel || isFav;
         
-        // Masaüstü Butonları Güncelleme
         if (btnMainSelect) {
             btnMainSelect.classList.toggle('active', isSel);
             btnMainSelect.querySelector('span').textContent = isSel ? 'Seçildi' : 'Seç';
@@ -329,11 +469,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btnMainFav.classList.toggle('active', isFav);
         }
         
-        // YENİ: Mobil Focus Modu Şeffaf Butonları Güncelleme
         if (focusSel) focusSel.classList.toggle('active-sel', isSel);
         if (focusFav) focusFav.classList.toggle('active-fav', isFav);
         
-        // Not Butonu
         const hasNote = image.note && image.note.trim() !== '';
         if (btnMainNote) {
             btnMainNote.classList.toggle('active', hasNote);
@@ -481,7 +619,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedItems = masterImageList.filter(img => img.selection_type === 1 || img.selection_type === 3);
         const favoritedCount = masterImageList.filter(img => img.selection_type === 2 || img.selection_type === 3).length;
         
-        // Yeni: Mobil Butondaki Sepet Sayısı Rozeti
         const cartBadge = document.getElementById('cart-badge');
         if(cartBadge) cartBadge.textContent = selectedItems.length;
 
@@ -492,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedItems.length === 0) {
             if (cartItemsContainer) cartItemsContainer.innerHTML = '';
-            if (cartEmptyMsg) cartEmptyMsg.style.display = 'flex'; // block yerine flex
+            if (cartEmptyMsg) cartEmptyMsg.style.display = 'flex'; 
         } else {
             if (cartEmptyMsg) cartEmptyMsg.style.display = 'none';
             if (cartItemsContainer) cartItemsContainer.innerHTML = '';
@@ -504,7 +641,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = document.createElement('div');
         item.className = 'cart-item';
         item.dataset.path = image.path;
-        item.innerHTML = `<img src="${image.path}" class="cart-item-thumb"><div class="cart-item-info"><div class="cart-item-filename">${getFilename(image.path)}</div><div class="cart-item-note-preview">${image.note ? 'Not: ' + image.note.substring(0,20) : ''}</div></div>`;
+        
+        item.innerHTML = `<img src="${getCachePath(image.path)}" onerror="this.onerror=null; this.src='${image.path}';" class="cart-item-thumb"><div class="cart-item-info"><div class="cart-item-filename">${getFilename(image.path)}</div><div class="cart-item-note-preview">${image.note ? 'Not: ' + image.note.substring(0,20) : ''}</div></div>`;
         
         const actions = document.createElement('div');
         actions.className = 'cart-item-actions';
@@ -524,7 +662,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const idx = viewableImageList.findIndex(img => img.path === image.path);
             if (idx > -1) setCurrentImage(idx);
             
-            // Mobilde tıklandığında sepeti otomatik kapatıp resmi göstersin
             if(window.innerWidth < 899 && cartSidebar) {
                 cartSidebar.classList.remove('open');
             }
@@ -563,7 +700,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filmstripContainer.addEventListener('wheel', (ev) => {
             if (Math.abs(ev.deltaY) > Math.abs(ev.deltaX)) { 
                 ev.preventDefault(); 
-                // Daha pürüzsüz kaydırma için (Smooth scroll)
                 filmstripContainer.scrollBy({
                     left: ev.deltaY > 0 ? 150 : -150, 
                     behavior: 'smooth' 
@@ -588,11 +724,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnConfirmSubmit) btnConfirmSubmit.onclick = handleCompleteSelection;
     if(btnConfirmClose) btnConfirmClose.onclick = () => confirmModal.style.display = 'none';
     
-    // YENİ FİX: Mobil Focus Mode Butonları
+    // Mobil Focus Mode Butonları
     if(focusSel) focusSel.onclick = () => handleToggleAction('select');
     if(focusFav) focusFav.onclick = () => handleToggleAction('favorite');
 
-    // YENİ FİX: Mobil Sepet Açma/Kapama
+    // Mobil Sepet Açma/Kapama
     if(cartToggleBtn) {
         cartToggleBtn.addEventListener('click', () => {
             if(cartSidebar) cartSidebar.classList.add('open');
@@ -604,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // YENİ FİX: Mobilde Resim Üzerinde Sağa/Sola Kaydırma (Swipe)
+    // Mobilde Resim Üzerinde Sağa/Sola Kaydırma (Swipe)
     const viewerArea = document.querySelector('.viewer-area');
     let touchStartX = 0;
     
@@ -617,12 +753,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const touchEndX = e.changedTouches[0].screenX;
             const diff = touchStartX - touchEndX;
             
-            // 50px'den fazla kaydırıldıysa yönü tespit et
             if (Math.abs(diff) > 50) {
                 if (diff > 0) {
-                    navigateLightbox(1); // Sola kaydırıldı, Sonrakine geç
+                    navigateLightbox(1); 
                 } else {
-                    navigateLightbox(-1); // Sağa kaydırıldı, Öncekine geç
+                    navigateLightbox(-1); 
                 }
             }
         }, {passive: true});
