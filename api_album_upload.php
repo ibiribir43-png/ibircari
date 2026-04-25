@@ -1,7 +1,7 @@
 <?php
 /**
  * api_album_upload.php
- * Hazır Albüm Yükleme | %20 Küçültme | TRAFİK KOTASI VE SOFT-LİMİT KONTROLÜ EKLENDİ
+ * Hazır Albüm Yükleme | ORİJİNAL KORUMA + CACHE (ÖNİZLEME) OLUŞTURMA | TRAFİK KOTASI KONTROLÜ
  */
 ini_set('memory_limit', '512M'); 
 set_time_limit(300);
@@ -15,6 +15,57 @@ header('Content-Type: application/json');
 if (!isset($db)) {
     echo json_encode(['status' => 'error', 'message' => 'Veritabanı bağlantısı yok']);
     exit;
+}
+
+// --- WEB CACHE (ÖNİZLEME) OLUŞTURMA FONKSİYONU ---
+function createWebCache($source, $destination, $scaleRatio = 0.50, $quality = 85) {
+    $info = @getimagesize($source);
+    if (!$info) return false;
+
+    $mime = $info['mime'];
+    $width = $info[0];
+    $height = $info[1];
+
+    switch ($mime) {
+        case 'image/jpeg': $image = @imagecreatefromjpeg($source); break;
+        case 'image/png': $image = @imagecreatefrompng($source); break;
+        case 'image/webp': $image = @imagecreatefromwebp($source); break;
+        default: return false; 
+    }
+    if (!$image) return false;
+
+    // Telefonla çekilen dik fotoğrafların yan yatmasını engelleme (EXIF Koruması)
+    if ($mime == 'image/jpeg' && function_exists('exif_read_data')) {
+        $exif = @exif_read_data($source);
+        if (!empty($exif['Orientation'])) {
+            switch ($exif['Orientation']) {
+                case 3: $image = imagerotate($image, 180, 0); break;
+                case 6: $image = imagerotate($image, -90, 0); list($width, $height) = [$height, $width]; break;
+                case 8: $image = imagerotate($image, 90, 0); list($width, $height) = [$height, $width]; break;
+            }
+        }
+    }
+
+    // ORANTISAL PIXEL KÜÇÜLTME (Albüm sayfaları için %50 oranında küçült)
+    $new_width = (int)($width * $scaleRatio);
+    $new_height = (int)($height * $scaleRatio);
+
+    $thumb = imagecreatetruecolor($new_width, $new_height);
+    if ($mime == 'image/png' || $mime == 'image/webp') {
+        imagealphablending($thumb, false);
+        imagesavealpha($thumb, true);
+    }
+    imagecopyresampled($thumb, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+    switch ($mime) {
+        case 'image/jpeg': imagejpeg($thumb, $destination, $quality); break;
+        case 'image/png': imagepng($thumb, $destination, round(9 - ($quality / 11.11))); break;
+        case 'image/webp': imagewebp($thumb, $destination, $quality); break;
+    }
+
+    imagedestroy($image);
+    imagedestroy($thumb);
+    return true;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['albums'])) {
@@ -65,12 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['albums'])) {
 
     // Klasör oluşturma
     $target_dir = __DIR__ . "/uploads/haziralbumler/{$firma_id}/{$musteri_id}/";
-    if (!is_dir($target_dir)) { mkdir($target_dir, 0775, true); }
+    $cache_dir = $target_dir . "cache/"; // Küçültülmüş dosyaların saklanacağı yer
+
+    if (!is_dir($target_dir)) { @mkdir($target_dir, 0775, true); }
+    if (!is_dir($cache_dir)) { @mkdir($cache_dir, 0775, true); }
 
     $uploaded_count = 0;
     $errors = [];
-    $scaleRatio = 0.80; // %20 Küçültme
-    $jpegQuality = 85;
 
     $num_files = is_array($files['name']) ? count($files['name']) : 1;
 
@@ -85,54 +137,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['albums'])) {
         $ext = strtolower(pathinfo($safe_name, PATHINFO_EXTENSION));
         if (!in_array($ext, ['jpg','jpeg','png','webp'])) continue;
 
-        // Kaynak oluştur
-        switch ($ext) {
-            case 'jpg':
-            case 'jpeg': $src = @imagecreatefromjpeg($tmp); break;
-            case 'png': $src = @imagecreatefrompng($tmp); break;
-            case 'webp': $src = @imagecreatefromwebp($tmp); break;
-            default: $src = null;
+        $dest_path_original = $target_dir . $safe_name;
+        $dest_path_cache = $cache_dir . $safe_name;
+
+        // 1. Orijinal dosyayı olduğu gibi (boyutunu bozmadan) indirilebilmesi için kaydet
+        if (move_uploaded_file($tmp, $dest_path_original)) {
+            // 2. Web önizlemesi için küçültülmüş kopyayı (cache) oluştur
+            // Albüm sayfaları olduğu için %50 oranında küçültüyoruz (ScaleRatio = 0.50)
+            createWebCache($dest_path_original, $dest_path_cache, 0.50, 85);
+            
+            $uploaded_count++;
+        } else {
+            $errors[] = "$name kaydedilemedi";
         }
-
-        if (!$src) { $errors[] = "$name açılamadı"; continue; }
-
-        // EXIF Orientation
-        if (($ext === 'jpg' || $ext === 'jpeg') && function_exists('exif_read_data')) {
-            $exif = @exif_read_data($tmp);
-            if (!empty($exif['Orientation'])) {
-                switch ($exif['Orientation']) {
-                    case 3: $src = imagerotate($src, 180, 0); break;
-                    case 6: $src = imagerotate($src, -90, 0); break;
-                    case 8: $src = imagerotate($src, 90, 0); break;
-                }
-            }
-        }
-
-        // ORANTISAL PIXEL KÜÇÜLTME
-        $srcW = imagesx($src);
-        $srcH = imagesy($src);
-        $newW = (int)($srcW * $scaleRatio);
-        $newH = (int)($srcH * $scaleRatio);
-        $dst = imagecreatetruecolor($newW, $newH);
-
-        if ($ext === 'png' || $ext === 'webp') {
-            imagealphablending($dst, false);
-            imagesavealpha($dst, true);
-        }
-
-        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $srcW, $srcH);
-        $dest_path = $target_dir . $safe_name;
-
-        // Kaydet
-        $saved = false;
-        if ($ext === 'jpg' || $ext === 'jpeg') { $saved = imagejpeg($dst, $dest_path, $jpegQuality); } 
-        elseif ($ext === 'png') { $saved = imagepng($dst, $dest_path, 6); } 
-        elseif ($ext === 'webp') { $saved = imagewebp($dst, $dest_path, 80); }
-
-        imagedestroy($src); imagedestroy($dst);
-
-        if ($saved) $uploaded_count++;
-        else $errors[] = "$name kaydedilemedi";
     }
 
     // --- TRAFİK (BANDWIDTH) GÜNCELLEME İŞLEMİ ---

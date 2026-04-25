@@ -721,5 +721,3 @@ window.exportTxt = function() {
 };
 </script>
 <?php include 'partials/footer_yonetim.php'; ?>
-
-işte güncel kod bu
